@@ -27,7 +27,7 @@ jobs:
       - name: setup source tree
         run: |
           git clone --depth=1 $BUILDROOT_SRC_URL $BUILDROOT_BUILD_DIR
-	  export BR2_EXTERNAL="$(echo $PWD)"
+          export BR2_EXTERNAL="$(echo $PWD)"
           cd $BUILDROOT_BUILD_DIR/
           make licheepi_nano_defconfig
       - name: build firmware
@@ -42,7 +42,7 @@ jobs:
       - name: generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::$(date +"%Y%m%d")"
+          echo "::set-output name=release_tag::$(date +"%Y%m%d")-nano"
       - name: make release
         uses: softprops/action-gh-release@v1
         env:
