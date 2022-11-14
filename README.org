@@ -1,0 +1,36 @@
+* llicheepi nano buildroot support
+
+** how to use this repo
+
+#+BEGIN_SRC shell
+  git clone https://git.buildroot.net/buildroot
+  export BR2_EXTERNAL=/path/to/thisrepo/
+  make licheepi_nano_defconfig
+  make -j$(nproc)
+  xfel spinor write 0x0 output/images/u-boot-sunxi-with-spl.bin
+  xfel spinor write 0x80000 output/images/suniv-f1c100s-licheepi-nano.dtb
+  xfel spinor write 0x90000 output/images/zImage
+#+END_SRC
+
+** flash layout
+
+keep it simple:
+
+| uboot | dtb |firmware |
+|-------+-----+---------|
+| 512k  | 64k |-        |
+
+firmware use for store linux kernel image and file system, like openwrt's flash layout.
+
+* change log
+
+2022/11/13:
+init project.
+
+2022/11/14:
+
+mianline uboot is ok.
+
+boot from spi nor flash is ok.
+
+usb gadget is ok, with some patch, import patch from Icenowy Zheng <icenowy@aosc.io>
