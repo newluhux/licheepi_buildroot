@@ -1,0 +1,57 @@
+name: build-nano
+run-name: build-nano
+on:
+  schedule:
+    - cron: '40 7 * * 4'
+  workflow_dispatch:
+env:
+  BUILDROOT_SRC_URL: https://github.com/buildroot/buildroot
+  TZ: UTC
+  BUILDROOT_BUILD_DIR: /tmp/buildroot/
+ 
+jobs:
+  build-image:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup environment
+        run: |
+          sudo apt install bc bison build-essential bzip2 ca-certificates -y
+          sudo apt install clang cmake cpio curl cvs diffutils wget swig -y
+          sudo apt install file findutils flex gawk gcc-multilib gettext git -y
+          sudo apt install grep gzip libelf-dev locales mercurial rsync -y
+          sudo apt install libncurses5-dev libssl-dev python2 python2-dev -y
+          sudo apt install python3 python3-dev rsync sudo apt install sed -y
+          sudo apt install subversion tar time unzip util-linux -y
+          sudo apt install xsltproc xz-utils zlib1g-dev -y
+      - name: setup source tree
+        run: |
+          git clone --depth=1 $BUILDROOT_SRC_URL $BUILDROOT_BUILD_DIR
+	  export BR2_EXTERNAL="$(echo $PWD)"
+          cd $BUILDROOT_BUILD_DIR/
+          make licheepi_nano_defconfig
+      - name: build firmware
+        run: |
+          cd $BUILDROOT_BUILD_DIR/
+          make -j $(nproc)
+      - name: organize files
+        id: organize
+        run: |
+          cd $BUILDROOT_BUILD_DIR/output/images/
+          echo "OUTPUT=$PWD" >> $GITHUB_ENV
+      - name: generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(date +"%Y%m%d")"
+      - name: make release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          files: ${{ env.OUTPUT }}/*
+      - name: delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 5
