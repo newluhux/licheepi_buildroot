@@ -23,7 +23,7 @@ jobs:
           sudo apt install libncurses5-dev libssl-dev python2 python2-dev -y
           sudo apt install python3 python3-dev rsync sed -y
           sudo apt install subversion tar time unzip util-linux -y
-          sudo apt install xsltproc xz-utils zlib1g-dev -y
+          sudo apt install xsltproc xz-utils zlib1g-dev squashfs-tools-ng -y
       - name: setup source tree
         run: |
           git clone --depth=1 $BUILDROOT_SRC_URL $BUILDROOT_BUILD_DIR
@@ -36,6 +36,15 @@ jobs:
           make -j $(nproc)
           make toolchain
           make sdk
+      - name: build docker image
+        run: |
+          cd $BUILDROOT_BUILD_DIR/support/docker/
+          docker build -t buildroot-dev .
+          cd $BUILDROOT_BUILD_DIR/outputimages/
+          docker run --name buildroot-dev buildroot-dev /bin/sh
+          docker export -o buildroot-dev.tar
+          tar2sqfs buildroot-dev.sqfs < buildroot-dev.tar
+          xz -z -v -9 buildroot-dev.tar.xz
       - name: organize files
         id: organize
         run: |
