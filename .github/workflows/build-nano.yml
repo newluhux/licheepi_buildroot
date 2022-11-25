@@ -34,6 +34,8 @@ jobs:
         run: |
           cd $BUILDROOT_BUILD_DIR/
           make -j $(nproc)
+          make toolchain
+          make sdk
       - name: organize files
         id: organize
         run: |
