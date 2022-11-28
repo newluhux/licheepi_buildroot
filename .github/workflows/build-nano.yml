@@ -44,7 +44,7 @@ jobs:
           docker run --name buildroot-dev buildroot-dev /bin/sh
           docker export buildroot-dev -o buildroot-dev.tar
           tar2sqfs buildroot-dev.sqfs < buildroot-dev.tar
-          xz -z -v -9 buildroot-dev.tar.xz
+          xz -z -v -9 buildroot-dev.tar
       - name: organize files
         id: organize
         run: |
