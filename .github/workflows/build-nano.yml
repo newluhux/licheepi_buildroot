@@ -40,13 +40,11 @@ jobs:
         run: |
           cd $BUILDROOT_BUILD_DIR/support/docker/
           docker build -t buildroot-dev .
-          cd $BUILDROOT_BUILD_DIR/outputimages/
+          cd $BUILDROOT_BUILD_DIR/output/images/
           docker run --name buildroot-dev buildroot-dev /bin/sh
           docker export -o buildroot-dev.tar
           tar2sqfs buildroot-dev.sqfs < buildroot-dev.tar
           xz -z -v -9 buildroot-dev.tar.xz
-          mv buildroot-dev.tar.xz $BUILDROOT_BUILD_DIR/output/images/
-          mv buildroot-dev.sqfs $BUILDROOT_BUILD_DIR/output/images/
       - name: organize files
         id: organize
         run: |
