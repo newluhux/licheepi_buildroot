@@ -1,5 +1,5 @@
-name: build-nano
-run-name: build-nano
+name: build
+run-name: build
 on:
   schedule:
     - cron: '40 7 * * 4'
@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: setup environment
         run: |
+          sudo apt update
           sudo apt install bc bison build-essential bzip2 ca-certificates -y
           sudo apt install clang cmake cpio curl cvs diffutils wget swig -y
           sudo apt install file findutils flex gawk gcc-multilib gettext git -y
@@ -35,7 +36,6 @@ jobs:
           cd $BUILDROOT_BUILD_DIR/
           make -j $(nproc)
           make toolchain
-          make sdk
       - name: build docker image
         run: |
           cd $BUILDROOT_BUILD_DIR/support/docker/
@@ -61,8 +61,3 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           files: ${{ env.OUTPUT }}/*
-      - name: delete workflow runs
-        uses: GitRML/delete-workflow-runs@main
-        with:
-          retain_days: 1
-          keep_minimum_runs: 5
